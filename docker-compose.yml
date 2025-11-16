@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:15
+    container_name: flogin_db
+    restart: always
+    environment:
+      POSTGRES_DB: softwaretestingfloginfebe
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: secret123
+    ports:
+      - "5432:5432"
+    volumes:
+      - flogin_db:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: flogin_be
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/softwaretestingfloginfebe
+      SPRING_DATASOURCE_USERNAME: appuser
+      SPRING_DATASOURCE_PASSWORD: secret123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: flogin_fe
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  flogin_db:

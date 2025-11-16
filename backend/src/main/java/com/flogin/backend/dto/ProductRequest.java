@@ -1,46 +1,31 @@
-package com.flogin.backend.entity;
+package com.flogin.backend.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "products")
-public class Product {
+@Builder
+public class ProductRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 100)
+    @NotBlank(message = "Product name must not be blank")
     @Size(min = 3, max = 100, message = "Product name must be 3-100 characters")
     private String name;
 
-    @Column(nullable = false)
+    @NotNull(message = "Price is required")
     @Min(value = 1, message = "Price must be greater than 0")
     @Max(value = 999_999_999, message = "Price must be less than 999,999,999")
     private Long price;
 
-    @Column(nullable = false)
+    @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity must be >= 0")
     @Max(value = 99_999, message = "Quantity must be <= 99,999")
     private Integer quantity;
 
-    @Column(length = 500)
     @Size(max = 500, message = "Description can be up to 500 characters")
     private String description;
 
-    @Column(nullable = false)
     @NotBlank(message = "Category must not be blank")
     private String category;
-
-    @Column(nullable = false)
-    private Boolean active = true;
 }
