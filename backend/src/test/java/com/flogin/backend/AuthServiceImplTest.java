@@ -112,4 +112,25 @@ class AuthServiceImplTest {
         assertNull(response.getToken());
         assertEquals("Password must be 6-100 characters", response.getMessage());
     }
+
+    @Test
+    public void testValidateUsername_ShouldReturnEmpty_WhenUsernameValid(){
+        String result = authService.validateUsername(username);
+        assertEquals("", result);
+    }
+    @Test
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameNullOrBlank(){
+        String result = authService.validateUsername("");
+        assertEquals("Username cannot be empty", result);
+    }
+    @Test
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameTooShortOrTooLong(){
+        String result = authService.validateUsername("u");
+        assertEquals("Username must be 3-50 characters", result);
+    }
+    @Test
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameInValidCharacters(){
+        String result = authService.validateUsername("test@");
+        assertEquals("Username contains invalid characters", result);
+    }
 }
