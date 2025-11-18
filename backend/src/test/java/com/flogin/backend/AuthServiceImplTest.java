@@ -5,13 +5,11 @@ import com.flogin.backend.dto.LoginRequest;
 import com.flogin.backend.dto.LoginResponse;
 import com.flogin.backend.entity.User;
 import com.flogin.backend.repository.UserRepository;
-import com.flogin.backend.service.impl.AuthServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
+import com.flogin.backend.service.auth.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -119,13 +117,23 @@ class AuthServiceImplTest {
         assertEquals("", result);
     }
     @Test
-    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameNullOrBlank(){
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameBlank(){
         String result = authService.validateUsername("");
         assertEquals("Username cannot be empty", result);
     }
     @Test
-    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameTooShortOrTooLong(){
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameNull(){
+        String result = authService.validateUsername(null);
+        assertEquals("Username cannot be empty", result);
+    }
+    @Test
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameTooShort(){
         String result = authService.validateUsername("u");
+        assertEquals("Username must be 3-50 characters", result);
+    }
+    @Test
+    public void testValidateUsername_ShouldReturnErrorMessage_WhenUsernameTooLong(){
+        String result = authService.validateUsername("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
         assertEquals("Username must be 3-50 characters", result);
     }
     @Test
@@ -140,18 +148,33 @@ class AuthServiceImplTest {
         assertEquals("", result);
     }
     @Test
-    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordNullOrBlank(){
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordBlank(){
         String result = authService.validatePassword("");
         assertEquals("Password cannot be empty", result);
     }
     @Test
-    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordTooShortOrTooLong(){
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordNull(){
+        String result = authService.validatePassword(null);
+        assertEquals("Password cannot be empty", result);
+    }
+    @Test
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordTooShort(){
         String result = authService.validatePassword("u");
         assertEquals("Password must be 6-100 characters", result);
     }
     @Test
-    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordMissingLetterOrDigit(){
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordTooLong(){
+        String result = authService.validatePassword("u1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        assertEquals("Password must be 6-100 characters", result);
+    }
+    @Test
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordMissingDigit(){
         String result = authService.validatePassword("password");
+        assertEquals("Password must contain both letters and numbers", result);
+    }
+    @Test
+    public void testValidatePassword_ShouldReturnErrorMessage_WhenPasswordMissingLetter(){
+        String result = authService.validatePassword("123456");
         assertEquals("Password must contain both letters and numbers", result);
     }
 }
