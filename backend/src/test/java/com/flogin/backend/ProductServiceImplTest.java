@@ -3,6 +3,7 @@ package com.flogin.backend;
 import com.flogin.backend.dto.ProductRequest;
 import com.flogin.backend.dto.ProductResponse;
 import com.flogin.backend.entity.Product;
+import com.flogin.backend.exception.EntityNotFoundException;
 import com.flogin.backend.repository.ProductRepository;
 import com.flogin.backend.service.product.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +84,7 @@ class ProductServiceImplTest {
     void testGetProductById_ShouldThrowException_WhenNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> productService.getProductById(1L));
+        assertThrows(EntityNotFoundException.class, () -> productService.getProductById(1L));
     }
 
     @Test
@@ -103,7 +104,7 @@ class ProductServiceImplTest {
     void testUpdateProduct_ShouldThrowException_WhenProductNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, ()->productService.updateProduct(1L, request));
+        assertThrows(EntityNotFoundException.class, ()->productService.updateProduct(1L, request));
     }
     @Test
     void testUpdateProduct_ShouldThrowException_WhenProductNameAlreadyExists() {
@@ -126,12 +127,12 @@ class ProductServiceImplTest {
     void testDeleteProduct_ShouldThrowException_WhenProductNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, ()->productService.deleteProduct(1L));
+        assertThrows(EntityNotFoundException.class, ()->productService.deleteProduct(1L));
     }
 
     @Test
     void testGetProducts_ShouldReturnPageProductResponse() {
-        List<Product> productList = Arrays.asList(product);
+        List<Product> productList = Collections.singletonList(product);
         Page<Product> page = new PageImpl<>(productList);
         when(productRepository.findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndActiveTrue(
                 anyString(), anyString(), any(Pageable.class)
@@ -141,11 +142,11 @@ class ProductServiceImplTest {
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getTotalElements());
-        assertEquals("Test Product", responsePage.getContent().get(0).getName());
+        assertEquals("Test Product", responsePage.getContent().getFirst().getName());
     }
     @Test
     void testGetProducts_ShouldReturnPageProductResponse_WhenNameKeyWordNull() {
-        List<Product> productList = Arrays.asList(product);
+        List<Product> productList = Collections.singletonList(product);
         Page<Product> page = new PageImpl<>(productList);
         when(productRepository.findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndActiveTrue(
                 anyString(), anyString(), any(Pageable.class)
@@ -155,11 +156,11 @@ class ProductServiceImplTest {
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getTotalElements());
-        assertEquals("Test Product", responsePage.getContent().get(0).getName());
+        assertEquals("Test Product", responsePage.getContent().getFirst().getName());
     }
     @Test
     void testGetProducts_ShouldReturnPageProductResponse_WhenCategoryKeywordNull() {
-        List<Product> productList = Arrays.asList(product);
+        List<Product> productList = Collections.singletonList(product);
         Page<Product> page = new PageImpl<>(productList);
         when(productRepository.findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndActiveTrue(
                 anyString(), anyString(), any(Pageable.class)
@@ -169,7 +170,7 @@ class ProductServiceImplTest {
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getTotalElements());
-        assertEquals("Test Product", responsePage.getContent().get(0).getName());
+        assertEquals("Test Product", responsePage.getContent().getFirst().getName());
     }
     @Test
     void testGetProducts_ShouldThrowException_WhenSizeIsZero() {

@@ -3,6 +3,7 @@ package com.flogin.backend.service.product;
 import com.flogin.backend.dto.ProductRequest;
 import com.flogin.backend.dto.ProductResponse;
 import com.flogin.backend.entity.Product;
+import com.flogin.backend.exception.EntityNotFoundException;
 import com.flogin.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,13 +27,13 @@ public class ProductServiceImpl implements IProductService {
         }
 
         Product product = Product.builder()
-                .name(request.getName())
-                .price(request.getPrice())
-                .quantity(request.getQuantity())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .active(true)
-                .build();
+            .name(request.getName())
+            .price(request.getPrice())
+            .quantity(request.getQuantity())
+            .description(request.getDescription())
+            .category(request.getCategory())
+            .active(true)
+            .build();
 
         productRepository.save(product);
 
@@ -43,8 +44,7 @@ public class ProductServiceImpl implements IProductService {
     @Transactional
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
+            .orElseThrow(() -> EntityNotFoundException.forId(Product.class, id));
         // Nếu đổi tên, kiểm tra trùng
         if (!product.getName().equalsIgnoreCase(request.getName()) && productRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("Product with this name already exists");
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements IProductService {
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> EntityNotFoundException.forId(Product.class, id));
         return mapToResponse(product);
     }
 
@@ -74,11 +74,11 @@ public class ProductServiceImpl implements IProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
 
         Page<Product> products = productRepository
-                .findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndActiveTrue(
-                        nameKeyword == null ? "" : nameKeyword,
-                        categoryKeyword == null ? "" : categoryKeyword,
-                        pageable
-                );
+            .findByNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndActiveTrue(
+                nameKeyword == null ? "" : nameKeyword,
+                categoryKeyword == null ? "" : categoryKeyword,
+                pageable
+            );
 
         return products.map(this::mapToResponse);
     }
@@ -87,21 +87,21 @@ public class ProductServiceImpl implements IProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> EntityNotFoundException.forId(Product.class, id));
 
         product.setActive(false);
         productRepository.save(product);
     }
 
     private ProductResponse mapToResponse(Product product) {
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
-                product.getQuantity(),
-                product.getDescription(),
-                product.getCategory(),
-                product.getActive()
-        );
+        return ProductResponse.builder()
+            .id(product.getId())
+            .name(product.getName())
+            .price(product.getPrice())
+            .quantity(product.getQuantity())
+            .description(product.getDescription())
+            .category(product.getCategory())
+            .active(product.getActive())
+            .build();
     }
 }

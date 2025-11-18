@@ -6,6 +6,7 @@ import com.flogin.backend.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ public class ProductController {
 
     // --- Create product ---
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Validated @RequestBody ProductRequest request) {
         ProductResponse response = productService.createProduct(request);
         return ResponseEntity.ok(response);
@@ -25,6 +27,7 @@ public class ProductController {
 
     // --- Update product ---
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Validated @RequestBody ProductRequest request
@@ -35,6 +38,7 @@ public class ProductController {
 
     // --- Product by id ---
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         ProductResponse response = productService.getProductById(id);
         return ResponseEntity.ok(response);
@@ -42,6 +46,7 @@ public class ProductController {
 
     // --- List products with filters and paging ---
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<ProductResponse>> listProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
@@ -54,6 +59,7 @@ public class ProductController {
 
     // --- Delete product ---
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

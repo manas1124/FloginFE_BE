@@ -3,6 +3,7 @@ package com.flogin.backend.config;
 import com.flogin.backend.entity.Role;
 import com.flogin.backend.entity.User;
 import com.flogin.backend.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 @Configuration
+@Slf4j
 public class DataLoader {
 
     @Bean
@@ -26,7 +28,7 @@ public class DataLoader {
                         .role(Role.ADMIN)
                         .build();
                 userRepository.save(testUser);
-                System.out.println("Test user created: testuser / Test123");
+                log.info("Test user created: testuser / Test123");
             }
             Optional<User> useropt = userRepository.findByUsername("testuser");
             User user = useropt.get();
