@@ -4,7 +4,7 @@ import { createDefaultPreset } from "ts-jest";
 const config: Config = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
-  // setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
