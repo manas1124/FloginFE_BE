@@ -1,15 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
 import { ProductList } from "../ProductList";
 
 // Mock the API client
-jest.mock("../../services/api");
+vi.mock("../../services/api");
 
 describe("ProductList Integration", () => {
-  const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
+  const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should fetch and display products", async () => {

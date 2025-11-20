@@ -1,83 +1,87 @@
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 
 export const handlers = [
-  rest.post("/api/auth/login", (req, res, ctx) => {
-    const { username, password } = req.body as any;
+  // --- AUTHENTICATION HANDLERS ---
+  http.post("/api/auth/login", async ({ request }) => {
+    // Access request body asynchronously using request.json() in MSW 2.x
+    const { username, password } = (await request.json()) as any;
 
     if (username === "validuser" && password === "validpass123") {
-      return res(
-        ctx.json({
-          success: true,
-          message: "Login successful",
-          token: "jwt-token",
-        })
-      );
+      // Successful login (HTTP 200)
+      return HttpResponse.json({
+        success: true,
+        message: "Login successful",
+        token: "jwt-token",
+      });
     } else {
-      return res(
-        ctx.status(401),
-        ctx.json({
+      // Failed login (HTTP 401 Unauthorized)
+      return HttpResponse.json(
+        {
           success: false,
           message: "Invalid credentials",
-        })
-      );
+        },
+        { status: 401 }
+      ); // Set the status code via the options object
     }
   }),
 
-  rest.get("/api/products", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        content: [
-          {
-            id: 1,
-            name: "Test Product",
-            price: 100,
-            quantity: 10,
-            description: "Test Description",
-            category: "Electronics",
-            active: true,
-          },
-        ],
-      })
-    );
+  // --- PRODUCT LIST HANDLER (GET /api/products) ---
+  http.get("/api/products", () => {
+    // Mocked list response
+    return HttpResponse.json({
+      content: [
+        {
+          id: 1,
+          name: "Test Product",
+          price: 100,
+          quantity: 10,
+          description: "Test Description",
+          category: "Electronics",
+          active: true,
+        },
+      ],
+    });
   }),
 
-  rest.get("/api/products/:id", (req, res, ctx) => {
-    const { id } = req.params;
-    return res(
-      ctx.json({
-        id: Number(id),
-        name: "Test Product",
-        price: 100,
-        quantity: 10,
-        description: "Test Description",
-        category: "Electronics",
-        active: true,
-      })
-    );
+  // --- GET PRODUCT BY ID HANDLER (GET /api/products/:id) ---
+  http.get("/api/products/:id", ({ params }) => {
+    const { id } = params;
+    // Mocked single product response
+    return HttpResponse.json({
+      id: Number(id),
+      name: "Test Product",
+      price: 100,
+      quantity: 10,
+      description: "Test Description",
+      category: "Electronics",
+      active: true,
+    });
   }),
 
-  rest.post("/api/products", (req, res, ctx) => {
-    const product = req.body as any;
-    return res(
-      ctx.json({
-        id: 1,
-        ...product,
-      })
-    );
+  // --- CREATE PRODUCT HANDLER (POST /api/products) ---
+  http.post("/api/products", async ({ request }) => {
+    const product = (await request.json()) as any;
+    // Mocked creation response with a new ID
+    return HttpResponse.json({
+      id: 1, // Mocked ID
+      ...product,
+    });
   }),
 
-  rest.put("/api/products/:id", (req, res, ctx) => {
-    const { id } = req.params;
-    const product = req.body as any;
-    return res(
-      ctx.json({
-        id: Number(id),
-        ...product,
-      })
-    );
+  // --- UPDATE PRODUCT HANDLER (PUT /api/products/:id) ---
+  http.put("/api/products/:id", async ({ params, request }) => {
+    const { id } = params;
+    const product = (await request.json()) as any;
+    // Mocked update response
+    return HttpResponse.json({
+      id: Number(id),
+      ...product,
+    });
   }),
 
-  rest.delete("/api/products/:id", (req, res, ctx) => {
-    return res(ctx.status(204));
+  // --- DELETE PRODUCT HANDLER (DELETE /api/products/:id) ---
+  http.delete("/api/products/:id", () => {
+    // HTTP 204 No Content response
+    return new HttpResponse(null, { status: 204 });
   }),
 ];

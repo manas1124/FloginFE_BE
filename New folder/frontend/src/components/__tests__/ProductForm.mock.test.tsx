@@ -1,14 +1,15 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
 import { ProductForm } from "../ProductForm";
 
-jest.mock("../../services/api");
-const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
+vi.mock("../../services/api");
+const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
 describe("ProductForm Mock Testing", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should mock CRUD operations for product creation", async () => {
@@ -145,7 +146,7 @@ describe("ProductForm Mock Testing", () => {
     };
     mockApiClient.createProduct.mockResolvedValue(mockResponse);
 
-    const onSuccess = jest.fn();
+    const onSuccess = vi.fn();
     render(<ProductForm onSuccess={onSuccess} />);
 
     const productData = {

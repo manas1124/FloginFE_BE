@@ -1,15 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
 import { Login } from "../Login";
 
 // Mock the API client
-jest.mock("../../services/api");
-const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
+vi.mock("../../services/api");
+const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
 describe("Login Mock Testing", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should mock authService.loginUser with successful response", async () => {

@@ -1,19 +1,20 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
 import { ProductForm } from "../ProductForm";
 
-jest.mock("../../services/api");
+vi.mock("../../services/api");
 
 describe("ProductForm Integration", () => {
-  const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
+  const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should submit form with valid data", async () => {
-    const onSuccess = jest.fn();
+    const onSuccess = vi.fn();
     const mockResponse = {
       data: {
         id: 1,
