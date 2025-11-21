@@ -2,9 +2,9 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
+import { createMockAxiosResponse } from "../../utils/mock-utils";
 import { testWrapperRender } from "../../utils/test-utils";
 import { Login } from "../Login";
-import { createMockAxiosResponse } from "./Common";
 
 // Mock the API client
 vi.mock("../../services/api");

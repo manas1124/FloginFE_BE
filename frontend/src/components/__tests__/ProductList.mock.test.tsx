@@ -1,8 +1,9 @@
 import { screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
+import { createMockAxiosResponse } from "../../utils/mock-utils";
+import { testWrapperRender } from "../../utils/test-utils";
 import { ProductList } from "../ProductList";
-import { createMockAxiosResponse } from "./Common";
 
 vi.mock("../../services/api");
 const mockApiClient = apiClient as Mocked<typeof apiClient>;

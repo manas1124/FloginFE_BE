@@ -1,11 +1,12 @@
-import { screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
-import { mockUseParams } from "../../utils/mock-utils";
 import { testWrapperRender } from "../../utils/test-utils";
+
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { createMockAxiosResponse } from "../../utils/mock-utils";
 import { ProductForm } from "../ProductForm";
-import { createMockAxiosResponse } from "./Common";
 
 // Mock the API client
 vi.mock("../../services/api");
@@ -32,7 +33,13 @@ describe("ProductForm Integration", () => {
       createMockAxiosResponse(mockResponse)
     );
 
-    testWrapperRender(<ProductForm />);
+    render(
+      <MemoryRouter initialEntries={["/products/create"]}>
+        <Routes>
+          <Route path="/products/create" element={<ProductForm />} />
+        </Routes>
+      </MemoryRouter>
+    );
 
     await userEvent.type(
       screen.getByTestId("product-name-input"),
@@ -77,9 +84,6 @@ describe("ProductForm Integration", () => {
   });
 
   it("should load product data when editing", async () => {
-    // Mock useParams for editing
-    mockUseParams({ id: "1" });
-
     const mockProduct = {
       id: 1,
       name: "Existing Product",
@@ -94,18 +98,19 @@ describe("ProductForm Integration", () => {
       createMockAxiosResponse(mockProduct)
     );
 
-    // Re-import the component after mocking useParams
-    const { ProductForm: ProductFormComponent } = await import(
-      "../ProductForm"
+    render(
+      <MemoryRouter initialEntries={["/product/edit/1"]}>
+        <Routes>
+          <Route path="/product/edit/:id" element={<ProductForm />} />
+        </Routes>
+      </MemoryRouter>
     );
-
-    testWrapperRender(<ProductFormComponent />);
 
     await waitFor(() => {
       expect(screen.getByTestId("product-name-input")).toHaveValue(
         "Existing Product"
       );
-      expect(screen.getByTestId("product-price-input")).toHaveValue("200");
+      expect(screen.getByTestId("product-price-input")).toHaveValue(200);
       expect(screen.getByTestId("product-category-input")).toHaveValue("Books");
     });
   });

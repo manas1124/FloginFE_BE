@@ -1,85 +1,27 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
-import { ProductForm } from "../ProductForm";
-import { createMockAxiosResponse } from "./Common";
+import { createMockAxiosResponse } from "../../utils/mock-utils";
+import { ProductDetail } from "../ProductDetail";
 
 vi.mock("../../services/api");
 
-describe("ProductForm Integration", () => {
+describe("ProductDetail Integration", () => {
   const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should submit form with valid data", async () => {
-    const mockResponse = {
-      id: 1,
-      name: "New Product",
-      price: 100,
-      quantity: 10,
-      description: "Test Description",
-      category: "Electronics",
-      active: true,
-    };
-    mockApiClient.createProduct.mockResolvedValue(
-      createMockAxiosResponse(mockResponse)
-    );
-
-    render(<ProductForm />);
-
-    await userEvent.type(
-      screen.getByTestId("product-name-input"),
-      "New Product"
-    );
-    await userEvent.type(screen.getByTestId("product-price-input"), "100");
-    await userEvent.type(screen.getByTestId("product-quantity-input"), "10");
-    await userEvent.type(
-      screen.getByTestId("product-category-input"),
-      "Electronics"
-    );
-    await userEvent.type(
-      screen.getByTestId("product-description-input"),
-      "Test Description"
-    );
-
-    await userEvent.click(screen.getByTestId("submit-product"));
-
-    await waitFor(() => {
-      expect(mockApiClient.createProduct).toHaveBeenCalledWith({
-        name: "New Product",
-        price: 100,
-        quantity: 10,
-        description: "Test Description",
-        category: "Electronics",
-      });
-    });
-  });
-
-  it("should display validation errors for invalid data", async () => {
-    render(<ProductForm />);
-
-    await userEvent.type(screen.getByTestId("product-name-input"), "ab");
-    await userEvent.click(screen.getByTestId("submit-product"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("form-errors")).toBeInTheDocument();
-      expect(
-        screen.getByText(/product name must be at least 3 characters/i)
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("should load product data when editing", async () => {
+  it("should fetch and display product details", async () => {
     const mockProduct = {
       id: 1,
-      name: "Existing Product",
-      price: 200,
-      quantity: 5,
-      description: "Existing Description",
-      category: "Books",
+      name: "Test Product",
+      price: 150,
+      quantity: 25,
+      description: "A great product",
+      category: "Electronics",
       active: true,
     };
 
@@ -87,20 +29,21 @@ describe("ProductForm Integration", () => {
       createMockAxiosResponse(mockProduct)
     );
 
-    // For editing, we need to mock the useParams hook
-    vi.mock("react-router-dom", () => ({
-      ...vi.requireActual("react-router-dom"),
-      useParams: () => ({ id: "1" }),
-    }));
-
-    render(<ProductForm />);
+    render(
+      <MemoryRouter initialEntries={["/products/1"]}>
+        <Routes>
+          <Route path="/products/:id" element={<ProductDetail />} />
+        </Routes>
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
-      expect(screen.getByTestId("product-name-input")).toHaveValue(
-        "Existing Product"
+      expect(screen.getByTestId("product-detail")).toBeInTheDocument();
+      expect(screen.getByTestId("product-name")).toHaveTextContent(
+        "Test Product"
       );
-      expect(screen.getByTestId("product-price-input")).toHaveValue("200");
-      expect(screen.getByTestId("product-category-input")).toHaveValue("Books");
+      expect(screen.getByTestId("product-price")).toHaveTextContent("$150");
+      expect(screen.getByTestId("product-quantity")).toHaveTextContent("25");
     });
   });
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient, type ProductResponse } from "../services/api";
 
@@ -19,7 +19,7 @@ export const ProductList: React.FC = () => {
         });
         setProducts(response.data.content);
       } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch products");
+        setError(`Failed to fetch products: ${err.response?.data?.message}`);
       } finally {
         setLoading(false);
       }

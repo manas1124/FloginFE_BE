@@ -2,10 +2,12 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
-import { createMockAxiosError } from "../../utils/mock-utils";
+import {
+  createMockAxiosError,
+  createMockAxiosResponse,
+} from "../../utils/mock-utils";
 import { testWrapperRender } from "../../utils/test-utils";
 import { Login } from "../Login";
-import { createMockAxiosResponse } from "./Common";
 
 // Mock the API client
 vi.mock("../../services/api");
@@ -66,7 +68,10 @@ describe("Login Component Integration", () => {
     testWrapperRender(<Login />);
 
     await userEvent.type(screen.getByTestId("username-input"), "testuser");
-    await userEvent.type(screen.getByTestId("password-input"), "wrongpassword");
+    await userEvent.type(
+      screen.getByTestId("password-input"),
+      "wrongpassword1!"
+    );
     await userEvent.click(screen.getByTestId("login-button"));
 
     await waitFor(() => {

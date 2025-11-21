@@ -1,10 +1,9 @@
 import { screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
-import { createMockAxiosError } from "../../utils/mock-utils";
+import { createMockAxiosError, createMockAxiosResponse } from "../../utils/mock-utils";
 import { testWrapperRender } from "../../utils/test-utils";
 import { ProductList } from "../ProductList";
-import { createMockAxiosResponse } from "./Common";
 
 // Mock the API client
 vi.mock("../../services/api");
@@ -53,6 +52,7 @@ describe("ProductList Integration", () => {
     await waitFor(() => {
       expect(screen.getByTestId("error-message")).toBeInTheDocument();
       expect(screen.getByText(/failed to fetch products/i)).toBeInTheDocument();
+      expect(screen.getByText(/network error/i)).toBeInTheDocument();
     });
   });
 });

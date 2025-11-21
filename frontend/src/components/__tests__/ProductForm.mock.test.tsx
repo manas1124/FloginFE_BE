@@ -1,10 +1,11 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi, type Mocked } from "vitest";
 import { apiClient } from "../../services/api";
+import { createMockAxiosResponse } from "../../utils/mock-utils";
 import { testWrapperRender } from "../../utils/test-utils";
 import { ProductForm } from "../ProductForm";
-import { createMockAxiosResponse } from "./Common";
 
 vi.mock("../../services/api");
 const mockApiClient = apiClient as Mocked<typeof apiClient>;
@@ -35,7 +36,7 @@ describe("ProductForm Mock Testing", () => {
     );
     await userEvent.type(screen.getByTestId("product-price-input"), "100");
     await userEvent.type(screen.getByTestId("product-quantity-input"), "10");
-    await userEvent.type(
+    await userEvent.selectOptions(
       screen.getByTestId("product-category-input"),
       "Electronics"
     );
@@ -72,7 +73,13 @@ describe("ProductForm Mock Testing", () => {
     const mockUpdateResponse = createMockAxiosResponse(updatedProduct);
     mockApiClient.updateProduct.mockResolvedValue(mockUpdateResponse);
 
-    testWrapperRender(<ProductForm productId={1} />);
+    render(
+      <MemoryRouter initialEntries={["/product/1"]}>
+        <Routes>
+          <Route path="product/:id" element={<ProductForm />} />
+        </Routes>
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId("product-name-input")).toHaveValue(
@@ -111,7 +118,7 @@ describe("ProductForm Mock Testing", () => {
       "Test Product"
     );
     await userEvent.type(screen.getByTestId("product-price-input"), "100");
-    await userEvent.type(
+    await userEvent.selectOptions(
       screen.getByTestId("product-category-input"),
       "Electronics"
     );
@@ -131,21 +138,20 @@ describe("ProductForm Mock Testing", () => {
       price: 150,
       quantity: 20,
       description: "Test desc",
-      category: "Test Category",
+      category: "Electronics",
       active: true,
     };
     const mockResponse = createMockAxiosResponse(mockProductData);
     mockApiClient.createProduct.mockResolvedValue(mockResponse);
 
-    const onSuccess = vi.fn();
-    testWrapperRender(<ProductForm onSuccess={onSuccess} />);
+    testWrapperRender(<ProductForm />);
 
     const productData = {
       name: "Test Product",
       price: "150",
       quantity: "20",
       description: "Test desc",
-      category: "Test Category",
+      category: "Electronics",
     };
 
     await userEvent.type(
@@ -164,7 +170,7 @@ describe("ProductForm Mock Testing", () => {
       screen.getByTestId("product-description-input"),
       productData.description
     );
-    await userEvent.type(
+    await userEvent.selectOptions(
       screen.getByTestId("product-category-input"),
       productData.category
     );
@@ -180,7 +186,6 @@ describe("ProductForm Mock Testing", () => {
         description: productData.description,
         category: productData.category,
       });
-      expect(onSuccess).toHaveBeenCalledWith(mockProductData);
     });
   });
 });
