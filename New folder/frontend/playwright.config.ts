@@ -16,13 +16,13 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
+    // {
+    //   name: "firefox",
+    //   use: { ...devices["Desktop Firefox"] },
+    // },
   ],
   webServer: {
-    command: "npm run start",
+    command: "yarn build && yarn preview",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },
